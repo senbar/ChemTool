@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import ChemistryDataService from './services/chemistry-data.service';
+import { ChemistryDataService } from './services/chemistry-data.service';
 
 const response= ref("")
 onMounted(async ()=>{
-  var json=await ChemistryDataService.getChemistryRecipes(fetch);
-  response.value= json;
+  var resp=await ChemistryDataService.fetchChemTemplate(fetch, "Unstable Mutagen")
+  response.value= resp.reduce((x:string, y:string)=> x + " " + y);
 })
 
 

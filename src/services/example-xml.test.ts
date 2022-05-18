@@ -1,0 +1,3 @@
+
+const example=`<root>1 part <template><title>Tooltip</title><part><name index=\"1\"/><value>[[#Oil|Oil]]</value></part><part><name index=\"2\"/><value><template><title>RecursiveChem/Oil</title></template></value></part></template>&lt;br&gt;1 part <template><title>Tooltip</title><part><name index=\"1\"/><value>[[#Welding Fuel|Welding Fuel]]</value></part><part><name index=\"2\"/><value><template><title>RecursiveChem/Welding Fuel</title></template></value></part></template>&lt;br&gt;1 part Oxygen</root>`
+export default example;
