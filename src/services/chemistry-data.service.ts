@@ -1,5 +1,3 @@
-import { rmSync } from 'fs';
-import { match, P } from 'ts-pattern';
 import _ from 'lodash';
 import type { fetchFunc } from './fetch.type';
 import TemplateDataService from './template-data.service';
@@ -10,7 +8,7 @@ const baseUrl="https://www.paradisestation.org/wiki/api.php?&origin=*";
 // type fetchFunc= typeof fetch;
 export namespace ChemistryDataService{
     export let fetchChemTemplate= async (fetch:fetchFunc, name:string)=>
-        TemplateDataService.fetchTemplatesWhere(fetch, templateName=>templateName==_templateNameFromChemical(name))
+        (await TemplateDataService.fetchTemplatesWhere(fetch, templateName=>templateName==_templateNameFromChemical(name)))[0]
 
     
 

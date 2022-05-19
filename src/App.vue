@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import _ from 'lodash';
 import { onMounted, ref } from 'vue';
 import { ChemistryDataService } from './services/chemistry-data.service';
+import { ChemistryDataParser } from './services/chemistry-xml-parser.service';
 
 const response= ref("")
 onMounted(async ()=>{
   var resp=await ChemistryDataService.fetchChemTemplate(fetch, "Unstable Mutagen")
-  response.value= resp.reduce((x:string, y:string)=> x + " " + y);
+  var parsed=ChemistryDataParser.parseString(resp);
+  var z= parsed.head().value()
+  response.value= _.reduce(parsed.head().value(), ((x:string|null, y:string|null) => x??"" + " " + y??""))??"undefined";
 })
 
 

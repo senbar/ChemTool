@@ -1,18 +1,28 @@
 import _ from 'lodash';
 import { match } from 'ts-pattern';
 
-export namespace ChemistryDataParser{
-    export let parseString= (string:string)=>
-    _.chain(string)
-    //todo fix missing domparser in test
-        .map(str=>new DOMParser().parseFromString(str, "application/xml"))
-        .map(document=> document.firstChild?.childNodes)
-        .map(nodes=> 
-            _.map(nodes, (x)=> 
-                match(x)
-                    .with({nodeName:"#text"}, (node => node))
-                    .with({nodeName:"template"}, (node => node.getElementsByTagName("tile").filter((element:ChildNode)=>element.textContent=="ResursiveChem")))
-                    .otherwise(node => {throw new Error("Unexpected node type: " + node.nodeName)} )))
-        
+export namespace ChemistryDataParser {
+    export const parseString = (string: object) =>
+        _.chain(string)
+            //todo fix missing domparser in test
+            .map(str => new DOMParser().parseFromString(str['parsetree']['*'], "application/xml"))
+            .map(doc => doc.children)
+            .map(nodes =>
+                _.map(nodes, (x) =>
+                    match(x)
+                        .with({ nodeName: "#text" }, (node => node.textContent))
+                        .with({ nodeName: "template" }, ((node:Element) => _.filter(node.getElementsByTagName("title"),((element: ChildNode) => element.textContent == "ResursiveChem"))[0].textContent))
+                        .otherwise(node => ("Unexpected node type: " + node?.nodeName))))
 
+    const traverseTree = (collection: HTMLCollection):string[] =>
+        _.map(collection, child =>
+            match(child)
+                .with({ nodeName: "root" }, (node => traverseTree(node.children)))
+                .with({ nodeName: "#text" }, (node => node.textContent))
+                .with({ nodeName: "template" }, (node => _.filter(
+                                                    node.getElementsByTagName("title"),
+                                                    function (element: Element) {return element.textContent?.includes("RecursiveChem") ?? false})
+                                                        [0].textContent))
+                .otherwise(node => ("Unexpected node type: " + node?.nodeName)))
+            .flat().map(x=>x??"")
 }
