@@ -1,8 +1,8 @@
-import _ from 'lodash'
-namespace Model {
-    interface Chemical{
+    export type Chemical={
         Name:string;
-        Recipe: {parts:number, substrate:Chemical}[]
+        Recipe: Recipe[]
     }
-
-}
+    export type Recipe={
+        parts:number,
+        substrate:Chemical
+    }
