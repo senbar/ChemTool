@@ -3,13 +3,15 @@ import _ from 'lodash';
 import { onMounted, ref } from 'vue';
 import { ChemistryDataService } from './services/chemistry-data.service';
 import { ChemistryDataParser } from './services/chemistry-xml-parser.service';
+import { ChemistryExpandService } from './services/chemistry-expand.service';
 
 const response= ref("")
 onMounted(async ()=>{
-  var resp=await ChemistryDataService.fetchChemTemplate(fetch, "Unstable Mutagen")
-  var parsed=ChemistryDataParser.parseString(resp);
-  var z= parsed.head().value()
-  response.value= _.reduce(parsed.head().value(), ((x:string|null, y:string|null) => x??"" + " " + y??""))??"undefined";
+  var resp=await ChemistryDataService.fetchChemTemplate(fetch, "Silver Sulfadiazine")
+  var parsed=ChemistryDataParser.parseString(resp).head().value();
+  var expanded= await ChemistryExpandService.expandRecipes(fetch, parsed);
+
+  console.log("complete")
 })
 
 

@@ -1,16 +1,21 @@
 import type { Chemical, Recipe } from '@/data/chemical.model';
 import _ from 'lodash';
 import { match, P } from 'ts-pattern';
+import { ChemicalNameConvert } from './chemical-name-convert';
 
 export namespace ChemistryDataParser {
-    export const parseString = (string: object) =>
-        _.chain(string)
-            //todo fix missing domparser in test
-            .map(str => new DOMParser().parseFromString(str['parsetree']['*'], "application/xml"))
-            .map(doc => doc.childNodes)
-            .map(nodes => traverseTreeAccumulate(nodes))
 
-    const traverseTreeAccumulate = (collection: NodeListOf<ChildNode>): Chemical  =>
+    export const parseString = (string: any) =>
+        _.chain<string>(string)
+            //todo fix missing domparser in test
+            .map(str => (
+                {
+                    title: ChemicalNameConvert.convertToChemicalName((str as any)["title"] as string),
+                    doc: new DOMParser().parseFromString((str as any)['parsetree']['*'], "application/xml")
+                }))
+            .map(({title, doc}) => traverseTree(title, doc.childNodes))
+
+    const traverseTree = (chemicalName:string,collection: NodeListOf<ChildNode>): Chemical  =>
         _.reduce(collection, ((accu: Chemical, child: ChildNode) =>
             match(matchNode(child))
                 .with(null, ()=> accu)
@@ -19,7 +24,7 @@ export namespace ChemistryDataParser {
                     accu.Recipe= accu.Recipe.concat(pairUpStringNodes(parsedStr!).map(pair=> matchPairsIntoRecipe(pair[0], pair[1])))
                     return accu
                 })
-        ), ({ Name: "test", Recipe: [] } as Chemical))
+        ), ({ Name: chemicalName, Recipe: [] } as Chemical))
 
     const matchNode = (child: ChildNode):string[]|null =>
         match(child)
@@ -27,7 +32,8 @@ export namespace ChemistryDataParser {
                 (node: ChildNode) =>  (_.map(node.childNodes, 
                     (childNode)=> matchNode(childNode)).filter((x): x is string[] => !!x)).flat())
             .with({ nodeName: "#text", parentNode: P.when(node => node?.nodeName == "root") },
-                node => node.textContent!.split("<br>").filter(x=>x!="")
+                node => node.textContent!
+                    .split("<br>").filter(x=>x!="")
                     .map(str=>str.trim().split("part").filter(str=>str!="")).flat())
             .with({ nodeName: "#text", textContent: P.when(text => text?.includes("RecursiveChem")) },
                 node =>[node.textContent!])
@@ -48,7 +54,7 @@ export namespace ChemistryDataParser {
                             .otherwise(x => x!) , Chemical(chemicalName))
                     
     const extractNumber=(str:string):number|undefined=>
-                     str.match(`/\d+/g`)?.map(Number)[0]
+                     str.match(/\d+/g)?.map(Number)[0]
 
 
     const Chemical = (name: string) => ({ Name: name } as Chemical)
