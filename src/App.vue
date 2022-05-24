@@ -1,94 +1,46 @@
 <script setup lang="ts">
 import _ from 'lodash';
 import { onMounted, ref } from 'vue';
-import { ChemistryDataService } from './services/chemistry-data.service';
+import type { Chemical } from './data/chemical.model';
 import { ChemistryDataParser } from './services/chemistry-xml-parser.service';
-import { ChemistryExpandService } from './services/chemistry-expand.service';
+import { ChemistryDataService } from './services/fetching/chemistry-data.service';
+import { ChemistryExpandService } from './services/fetching/chemistry-expand.service';
 
-const response= ref("")
+const chemicalToShow= ref<Chemical>()
+const text="";
+
 onMounted(async ()=>{
-  var resp=await ChemistryDataService.fetchChemTemplate(fetch, "Silver Sulfadiazine")
-  var parsed=ChemistryDataParser.parseString(resp).head().value();
-  var expanded= await ChemistryExpandService.expandRecipes(fetch, parsed);
-
-  console.log("complete")
 })
 
+const searchForRecipeAndExpand = async (name:string) =>{
+  var chemical=await ChemistryDataService.fetchChemTemplate(fetch, name).then(res=>
+    ChemistryDataParser.parseString(res).head().value());
+  chemicalToShow.value= await ChemistryExpandService.expandRecipes(fetch, chemical);
+}
 
 </script>
 
 <template>
-  <header>
+<header>
+  <h1>Search for chemical</h1>
 
-    <div class="wrapper">
-    </div>
-  </header>
-
+    <input v-model="text">
+    <button @click="searchForRecipeAndExpand(text)">Search</button>
+</header>
   <main>
-    test
-    response is: {{response}}
+    {{chemicalToShow?.Name ?? "nothing"}}
   </main>
 </template>
 
 <style>
 @import './assets/base.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
+header{
+  display: flex;
+justify-content: center;
+margin-top:2rem
 }
+main {
 
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
 }
 </style>

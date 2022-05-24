@@ -2,8 +2,8 @@ import type { Chemical, Recipe } from "@/data/chemical.model";
 import _ from 'lodash';
 import { match, P } from "ts-pattern";
 import { ChemistryDataService } from "./chemistry-data.service";
-import { ChemistryDataParser } from "./chemistry-xml-parser.service";
-import { ChemicalNameConvert } from "./chemical-name-convert";
+import { ChemistryDataParser } from "../chemistry-xml-parser.service";
+import { ChemicalNameConvert } from "../chemical-name-convert";
 import type { fetchFunc } from "./fetch.type";
 
 export namespace ChemistryExpandService

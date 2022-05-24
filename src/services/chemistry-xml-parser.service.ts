@@ -34,7 +34,7 @@ export namespace ChemistryDataParser {
             .with({ nodeName: "#text", parentNode: P.when(node => node?.nodeName == "root") },
                 node => node.textContent!
                     .split("<br>").filter(x=>x!="")
-                    .map(str=>str.trim().split("part").filter(str=>str!="")).flat())
+                    .map(str=>str.trim().split(" part").filter(str=>str!="")).flat().map(str=> str.trim()))
             .with({ nodeName: "#text", textContent: P.when(text => text?.includes("RecursiveChem")) },
                 node =>[node.textContent!])
             .otherwise(_ => null)
@@ -58,5 +58,5 @@ export namespace ChemistryDataParser {
 
 
     const Chemical = (name: string) => ({ Name: name } as Chemical)
-    const Recipe = (amount: number, chemical: Chemical) => ({ parts: 1, substrate: chemical } as Recipe)
+    const Recipe = (amount: number, chemical: Chemical) => ({ parts: amount, substrate: chemical } as Recipe)
 }
