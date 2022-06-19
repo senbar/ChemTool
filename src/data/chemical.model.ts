@@ -1,6 +1,6 @@
     export type Chemical={
-        Name:string;
-        Recipe: Recipe[]
+        name:string;
+        recipe: Recipe[]
     }
     export type Recipe={
         parts:number,

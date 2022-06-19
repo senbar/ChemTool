@@ -10,13 +10,17 @@ export namespace ChemistryExpandService
 {
     export const expandRecipes= async (fetch: fetchFunc, chem:Chemical):Promise<Chemical>=>
     ({
-        Name: chem.Name,
-        Recipe: await Promise.all(_.map(chem.Recipe, (recipe)=> 
+        name: chem.name,
+        recipe: await Promise.all(_.map(chem.recipe, (recipe)=> 
             match(recipe)
-                .with({ substrate: {Name : P.when(name=>name.includes("Recursive"))} }, async (chemical)=>
-                    await ChemistryDataService.fetchChemTemplate(fetch, 
-                            ChemicalNameConvert.convertToChemicalName(chemical.substrate.Name))
-                            .then(res=>ChemistryDataParser.parseString(res).head().value()))
+                .with({ substrate: {name : P.when(name=>name.includes("Recursive"))} }, async (recipe)=>
+                    ({ 
+                        parts: recipe.parts,
+                        substrate: await ChemistryDataService.fetchChemTemplate(fetch, 
+                            ChemicalNameConvert.convertToChemicalName(recipe.substrate.name))
+                            .then(res=>ChemistryDataParser.parseString(res).head().value())
+                    } as Recipe))
+
                 .otherwise(recipe=>recipe)
                 ))
     } as Chemical)

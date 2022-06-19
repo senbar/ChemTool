@@ -2,45 +2,62 @@
 import _ from 'lodash';
 import { onMounted, ref } from 'vue';
 import type { Chemical } from './data/chemical.model';
+import type { Dose } from './data/dose.model';
+import { BaseDosesCalculator } from './services/base-doses-calculator';
 import { ChemistryDataParser } from './services/chemistry-xml-parser.service';
 import { ChemistryDataService } from './services/fetching/chemistry-data.service';
 import { ChemistryExpandService } from './services/fetching/chemistry-expand.service';
 
-const chemicalToShow= ref<Chemical>()
-const text="";
+const dosesToShow = ref<Dose[]>()
+const text = "";
 
-onMounted(async ()=>{
+onMounted(async () => {
 })
 
-const searchForRecipeAndExpand = async (name:string) =>{
-  var chemical=await ChemistryDataService.fetchChemTemplate(fetch, name).then(res=>
+const searchForRecipeAndExpand = async (name: string) => {
+  var chemical = await ChemistryDataService.fetchChemTemplate(fetch, name).then(res =>
     ChemistryDataParser.parseString(res).head().value());
-  chemicalToShow.value= await ChemistryExpandService.expandRecipes(fetch, chemical);
+    
+  var expanded= await ChemistryExpandService.expandRecipes(fetch, chemical);
+  dosesToShow.value =BaseDosesCalculator.calculateBaseDoses(expanded, 90);
+
 }
 
 </script>
 
 <template>
-<header>
-  <h1>Search for chemical</h1>
+  <header>
+    <h1>Search for chemical</h1>
 
-    <input v-model="text">
-    <button @click="searchForRecipeAndExpand(text)">Search</button>
-</header>
+    <div class="search-box">
+      <input v-model="text">
+      <button @click="searchForRecipeAndExpand(text)">Search</button>
+    </div>
+  </header>
   <main>
-    {{chemicalToShow?.Name ?? "nothing"}}
+    <li v-for="(item, index) in dosesToShow">
+      {{ index }} - {{ item.chemical }} - {{item.amount}}u
+</li>
   </main>
 </template>
 
 <style>
 @import './assets/base.css';
 
-header{
+header {
   display: flex;
-justify-content: center;
-margin-top:2rem
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-flow: column;
 }
-main {
 
+header h1 {width: 11rem;}
+
+.search-box{
+  width:15rem;
 }
+
+header main {}
 </style>

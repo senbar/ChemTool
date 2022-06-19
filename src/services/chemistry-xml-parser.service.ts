@@ -21,10 +21,10 @@ export namespace ChemistryDataParser {
                 .with(null, ()=> accu)
                 .otherwise((parsedStr:string[]|null)=> 
                 {
-                    accu.Recipe= accu.Recipe.concat(pairUpStringNodes(parsedStr!).map(pair=> matchPairsIntoRecipe(pair[0], pair[1])))
+                    accu.recipe= accu.recipe.concat(pairUpStringNodes(parsedStr!).map(pair=> matchPairsIntoRecipe(pair[0], pair[1])))
                     return accu
                 })
-        ), ({ Name: chemicalName, Recipe: [] } as Chemical))
+        ), ({ name: chemicalName, recipe: [] } as Chemical))
 
     const matchNode = (child: ChildNode):string[]|null =>
         match(child)
@@ -57,6 +57,6 @@ export namespace ChemistryDataParser {
                      str.match(/\d+/g)?.map(Number)[0]
 
 
-    const Chemical = (name: string) => ({ Name: name } as Chemical)
+    const Chemical = (name: string) => ({ name: name, recipe:[] } as Chemical)
     const Recipe = (amount: number, chemical: Chemical) => ({ parts: amount, substrate: chemical } as Recipe)
 }

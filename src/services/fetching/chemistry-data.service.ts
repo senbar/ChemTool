@@ -7,6 +7,6 @@ const baseUrl="https://www.paradisestation.org/wiki/api.php?&origin=*";
 
 export namespace ChemistryDataService{
     export const fetchChemTemplate= async (fetch:fetchFunc, name:string)=>
-        (await TemplateDataService.fetchTemplatesWhere(fetch, templateName=>templateName==ChemicalNameConvert.convertToTemplateName(name)))[0]
+        (await TemplateDataService.fetchTemplatesWhere(fetch, templateName=>templateName==ChemicalNameConvert.convertToTemplateName(name)))[0] 
 
 }
