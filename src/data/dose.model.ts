@@ -1,8 +1,10 @@
 //this is for calculating base substrates for recipe
 export type Dose={
     //chemical name
-    chemical: string,
+    chemical: string;
 
     //amount in units
-    amount: number
+    amount: number;
+
+    inverseStep:number;
 }
